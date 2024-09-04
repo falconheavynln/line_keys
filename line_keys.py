@@ -1,9 +1,9 @@
-import pygame
+import pygame as py
 from time import sleep
 from math import sin, cos, pi
 from levels import LEVELS
 
-pygame.init
+py.init()
 
 WIDTH = 400
 HEIGHT = 900
@@ -11,25 +11,25 @@ FPS = 60
 LINELENGTH = 1000000
 DLINEY = 800
 SPEED = 5
-COLOR = (255, 95, 95)
-BUTTONCOLOR = (255, 52, 52)
-BPOS = (100, 650, 200, 60)
+COLOR = py.Color(255, 95, 95)
+BUTTONCOLOR = py.Color(255, 52, 52)
+BPOS = 100, 650, 200, 60
 CAPTION = "Line Keys"
 PATH = "assets"
 ICON = "icon.png"
 
-wd = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption(CAPTION)
-pygame.display.set_icon(pygame.image.load(ICON))
+wd = py.display.set_mode((WIDTH, HEIGHT))
+py.display.set_caption(CAPTION)
+py.display.set_icon(py.image.load(ICON))
 
 
-class Line(pygame.sprite.Sprite):
+class Line(py.sprite.Sprite):
     def __init__(self, angle, parent):
         self.angle = angle
         self.parent = parent
 
     def draw(self):
-        pygame.draw.line(
+        py.draw.line(
             wd,
             (0, 0, 0),
             (self.parent.x, self.parent.y),
@@ -40,7 +40,7 @@ class Line(pygame.sprite.Sprite):
         )
 
 
-class Node(pygame.sprite.Sprite):
+class Node(py.sprite.Sprite):
     def __init__(self, x, angle, delay):
         self.x, self.y = x, -SPEED * delay * 60
         self.delay = delay
@@ -50,8 +50,8 @@ class Node(pygame.sprite.Sprite):
 
     def loop(self, transition):
         _ = [line.draw() for line in self.lines]
-        pygame.draw.circle(wd, (0, 0, 0), (self.x, self.y), 10)
-        pygame.draw.circle(wd, (255, 255, 255), (self.x, self.y), 7)
+        py.draw.circle(wd, (0, 0, 0), (self.x, self.y), 10)
+        py.draw.circle(wd, (255, 255, 255), (self.x, self.y), 7)
         if not transition:
             self.y += SPEED
 
@@ -61,13 +61,13 @@ def main():
     state, transition = "title", None
     hold, click = False, None
 
-    clock = pygame.time.Clock()
+    clock = py.time.Clock()
     run = True
     while run:
-        pygame.display.update()
+        py.display.update()
         clock.tick(FPS)
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
+        for event in py.event.get():
+            if event.type == py.QUIT:
                 run = False
                 break
 
@@ -75,13 +75,13 @@ def main():
         if level_change:
             level = [Node(info[0], info[1], info[2]) for info in LEVELS[level_num - 1]]
             level_change = False
-        if pygame.mouse.get_pressed(num_buttons=3)[0]:
-            click = pygame.mouse.get_pos() if not click and not hold else None
+        if py.mouse.get_pressed(num_buttons=3)[0]:
+            click = py.mouse.get_pos() if not click and not hold else None
             hold = True
         else:
             hold, click = False, None
         if state == "title":
-            pygame.draw.rect(wd, BUTTONCOLOR, BPOS)
+            py.draw.rect(wd, BUTTONCOLOR, BPOS)
             if click:
                 if (
                     BPOS[0] <= click[0] <= BPOS[0] + BPOS[2]
@@ -94,15 +94,19 @@ def main():
                 if node.y + SPEED >= DLINEY and not transition:
                     sleep(1)
                     transition = [[node.x, DLINEY], 0]
-                pygame.draw.line(wd, (255, 255, 255), (0, DLINEY), (WIDTH, DLINEY), 10)
+                py.draw.line(wd, (255, 255, 255), (0, DLINEY), (WIDTH, DLINEY), 10)
         if transition:
-            pygame.draw.circle(wd, BUTTONCOLOR, transition[0], transition[1])
+            py.draw.circle(
+                wd,
+                (BUTTONCOLOR.r, BUTTONCOLOR.g, BUTTONCOLOR.b, 5),
+                transition[0],
+                transition[1],
+            )
             transition[1] += 10
-            print("fhek")
             if transition[1] >= WIDTH * 3 or transition[1] >= HEIGHT * 3:
                 transition = None
                 state = "title"
-    pygame.quit()
+    py.quit()
     quit()
 
 
